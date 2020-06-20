@@ -795,6 +795,10 @@ int main(int argc, char *argv[])
     if (command == CMD_READ_USER_ROW)
     {
         read_user_row();
+        if (restart_after_program)
+        {
+            jump_application();
+        }
         goto exitProgram;
     }
 
