@@ -1,44 +1,12 @@
-### User instructions
-
-1. Follow the instructions here to download the executable for your operating system: https://github.com/Massdrop/mdloader/releases
-
-2. Plug in your keyboard.
-
-3. In your terminal, change to the directory where you downloaded the executable and applet-*.bin file(s).
-
-4. **Windows** - Run `mdloader_windows.exe --first --download FILE_NAME --restart`. Replace "FILE_NAME" with the filename of your compiled firmware.  
-**Linux** - Run `mdloader_linux --first --download FILE_NAME --restart`. Replace "FILE_NAME" with the filename of your compiled firmware. Depending on your user's permissions, you might have to add your user to the `dialout` group or use `sudo` on the command.  
-**Mac** - Run `mdloader_mac --first --download FILE_NAME --restart`.  If you downloaded with Mac Safari, run `mdloader_mac.dms --first --download FILE_NAME --restart`. Replace "FILE_NAME" with the filename of your compiled firmware. 
-  
-5. You should see the message:  
-```
-Scanning for device for 60 seconds  
-.....
-```
-
-6. Within 60 seconds, press the reset button on your keyboard. For most keyboards running the default firmware, you can hold `Fn` + `b` for half a second and release to reset your keyboard (you will see the LEDs turn off). For CTRL keyboards in the first production run running original firmware or of the first method does not work for you, you will need to use a pin to press the reset button through the hole in the bottom of the keyboard.
-
-7. You should see a series of messages similar to:
-```
-Device port: /dev/cu.usbmodem234431 (SAMD51J18A)
-
-Opening port '/dev/cu.usbmodem234431'... Success!
-Found MCU: SAMD51J18A
-Bootloader version: v2.18Sep  4 2018 16:48:28
-Applet file: applet-flash-samd51j18a.bin
-Applet Version: 1
-Writing firmware... Complete!
-Booting device... Success!
-Closing port... Success!
-```
-
-8. Afterwards, you should see the keyboard's LEDs light up again (if your configuration has LEDs enabled) and the keyboard should respond to typing. Your keyboard is now running the new firmware you specified.
-
------
-
-# Massdrop Loader
+# Massdrop Loader (with SmartEEPROM support)
 
 Massdrop Loader is used to read firmware from and write firmware to Massdrop keyboards which utilize Microchip's SAM-BA bootloader, over the USB connection.
+
+This is a modified version of Drop's [mdloader](https://github.com/Massdrop/mdloader) with the option to enable SmartEEPROM on the Drop ALT and CTRL based on work by [**@daltona**](https://github.com/daltona/mdloader/commit/7bbec3ca032dd87df065f49b69dfa3468f8862cb). Precompiled binaries for macOS and Windows are available in the [releases page](https://github.com/nicoelayda/mdloader/releases/latest).
+
+I'll try to provide builds here until Drop decides to merge SmartEEPROM support into the official mdloader ([PR](https://github.com/Massdrop/mdloader/pull/16)).
+
+Source for compatible firmware is available in the [`feature/smart-eeprom`](https://github.com/nicoelayda/qmk_firmware/tree/feature/smart-eeprom) branch of my QMK fork.
 
 ## Supported operating systems
 
@@ -48,7 +16,59 @@ Mac OS X
 
 ## Supported devices
 
-Massdrop keyboard's featuring Microchip's SAM-BA bootloader.
+Massdrop keyboards featuring Microchip's SAM-BA bootloader.
+
+## Quick start
+
+#### To enable SmartEEPROM support:
+
+1. [Download](https://github.com/nicoelayda/mdloader/releases/latest) the appropriate `mdloader` for your operating system.
+2. Open Terminal (macOS) or Command Prompt (Windows)
+3. Type in the following
+
+    **macOS:** `./mdloader_mac --first --smarteep --restart`
+    
+    **Windows:** `mdloader_windows.exe --first --smarteep --restart` 
+    
+
+4. The Massdrop loader will start scanning for connected keyboards.
+5. If you are on the stock firmware, hold down `Fn` + `B` for 0.5 seconds, then release. You should see a similar message to the one below, and your keyboard will reboot.
+
+    ```
+    Opening port '/dev/cu.usbmodem34201'... Success!
+    Found MCU: SAMD51J18A
+    Bootloader version: v2.20 Mar 27 2019 10:04:48 [alt]
+    user row: 0xfe9a9239 0xaeecff92 0xffffffff 0xffffffff
+    SmartEEPROM not configured, proceed
+    Booting device... Success!
+    ```
+ 6. SmartEEPROM support is now enabled. This only needs to be done once per keyboard.
+
+#### To install firmware:
+
+**Note**: If you are using a Drop CTRL, use `massdrop_ctrl_default-smarteeprom.bin` instead.
+
+1. [Download](https://github.com/nicoelayda/mdloader/releases/latest) the appropriate `mdloader` for your operating system, together with `applet-flash-samd51j18a.bin` and `massdrop_alt_default-smarteeprom.bin`.
+2. Open Terminal (macOS) or Command Prompt (Windows)
+3. Type in the following
+
+    **macOS:** `./mdloader_mac --first --download massdrop_alt_default-smarteeprom.bin --restart`
+    
+    **Windows:** `mdloader_windows.exe --first --download massdrop_alt_default-smarteeprom.bin --restart`
+
+4. If you are on the stock firmware, hold down `Fn` + `B` for 0.5 seconds, then release. You should see a similar message to the one below, and your keyboard will reboot.
+
+    ```
+    Opening port '/dev/cu.usbmodem34201'... Success!
+    Found MCU: SAMD51J18A
+    Bootloader version: v2.20 Mar 27 2019 10:04:48 [alt]
+    Applet file: applet-flash-samd51j18a.bin
+    Applet Version: 1
+    Writing firmware... Complete!
+    Booting device... Success!
+    Closing port... Success!
+    ```
+5. New firmware is now installed. Any settings changed will persist across reboots.
 
 ## Building
 
