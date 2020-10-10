@@ -48,7 +48,7 @@ Massdrop keyboards featuring Microchip's SAM-BA bootloader.
 
 **Note**: If you are using a Drop CTRL, use `massdrop_ctrl_default-smarteeprom.bin` instead.
 
-1. [Download](https://github.com/nicoelayda/mdloader/releases/latest) the appropriate `mdloader` for your operating system, together with `applet-flash-samd51j18a.bin` and `massdrop_alt_default-smarteeprom.bin`.
+1. [Download](https://github.com/nicoelayda/mdloader/releases/latest) the appropriate `mdloader` for your operating system, together with `applet-mdflash.bin` and `massdrop_alt_default-smarteeprom.bin`.
 2. Open Terminal (macOS) or Command Prompt (Windows)
 3. Type in the following
 
