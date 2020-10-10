@@ -1,0 +1,85 @@
+name: Release Builds
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create_release:
+    name: Create new release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  build_release:
+    name: ${{ matrix.config.name }}
+    needs: create_release
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - {
+              name: Build mdloader for macOS,
+              os: macos-latest,
+              artifact: mdloader,
+              upload_asset_name: mdloader_mac
+            }
+          - {
+              name: Build mdloader for Windows,
+              os: windows-latest,
+              artifact: mdloader.exe,
+              upload_asset_name: mdloader_windows.exe
+            }
+          - {
+              name: Build mdloader for Linux,
+              os: ubuntu-latest,
+              artifact: mdloader,
+              upload_asset_name: mdloader_linux
+            }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Build mdloader
+        run: make
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_name: ${{ matrix.config.upload_asset_name }}
+          asset_path: ./build/${{ matrix.config.artifact }}
+          asset_content_type: application/octet-stream
+
+  upload_applet_flash:
+    name: Upload applet flash file
+    needs: create_release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_name: applet-mdflash.bin
+          asset_path: ./applet-mdflash.bin
+          asset_content_type: application/octet-stream
